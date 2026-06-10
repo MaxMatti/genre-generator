@@ -562,8 +562,9 @@
             document.body.removeChild(textArea);
         }
 
+        const shareButtonContent = shareButton.innerHTML;
         shareButton.textContent = copied ? "Link copied!" : "Copy failed";
-        setTimeout(() => shareButton.textContent = "Share", 1500);
+        setTimeout(() => shareButton.innerHTML = shareButtonContent, 1500);
     }
 
     window.addEventListener("hashchange", () => {
