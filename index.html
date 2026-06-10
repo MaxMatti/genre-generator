@@ -252,7 +252,7 @@
         "instrumental ",
         "intelligent ",
         "italo ",
-        "j-",
+        "J-",
         "jackin ",
         "jazz",
         "jazz ",
@@ -287,7 +287,7 @@
         "neoclassical ",
         "neuro",
         "new ",
-        "new jersey ",
+        "New Jersey ",
         "night",
         "nintendo",
         "noise ",
@@ -344,7 +344,7 @@
         "trip ",
         "tropical ",
         "turbo ",
-        "uk ",
+        "UK ",
         "uplifting ",
         "vapor",
         "vocal ",
@@ -380,7 +380,7 @@
         "drone",
         "drum and bass",
         "dub",
-        "edm",
+        "EDM",
         "electro",
         "electronic",
         "electronica",
@@ -412,11 +412,11 @@
         "line",
         "melody",
         "metal",
-        "midi",
+        "MIDI",
         "music",
         "new-age",
         "noise",
-        "nrg",
+        "NRG",
         "ology",
         "phonics",
         "phonk",
@@ -426,7 +426,7 @@
         "pop",
         "psytrance",
         "punk",
-        "r&b",
+        "R&B",
         "rap",
         "rave",
         "reductionism",
@@ -461,13 +461,21 @@
         "wave",
     ];
 
-    function capitalization(word, suffix) {
-        if (suffix == "") {
-          return suffix;
-        } else if (word == "" || word.endsWith(" ") || word.endsWith("-")) {
-          return suffix[0].toUpperCase() + suffix.substring(1);
+    function capitalization(word, part) {
+        if (part == "") {
+          return part;
+        }
+
+        const followsSeparator = word == "" || word.endsWith(" ") || word.endsWith("-");
+        const preservesOwnCapitalization = /[A-Z]/.test(part);
+        const separator = !followsSeparator && /^[A-Z]/.test(part) ? (Math.random() < 0.5 ? "-" : " ") : "";
+
+        if (preservesOwnCapitalization) {
+          return separator + part;
+        } else if (followsSeparator) {
+          return part[0].toUpperCase() + part.substring(1);
         } else {
-          return suffix[0].toLowerCase() + suffix.substring(1);
+          return part[0].toLowerCase() + part.substring(1);
         }
     }
 
