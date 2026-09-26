@@ -1,0 +1,45 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches: [pages]
+
+jobs:
+  deploy:
+    runs-on: pages
+    if: github.ref == 'refs/heads/pages'
+    env:
+      PAGES_TARGET: public/genre-generator
+      PAGES_SOURCE_DIR: .
+      PAGES_INCLUDE_HIDDEN: "false"
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Verify site content
+        run: |
+          test -d "$PAGES_SOURCE_DIR"
+          test -f "$PAGES_SOURCE_DIR/index.html"
+
+      - name: Package static site subfolder
+        run: |
+          if [ "$PAGES_INCLUDE_HIDDEN" = "true" ]; then
+            echo "warning: publishing hidden files for $PAGES_TARGET"
+            tar -C "$PAGES_SOURCE_DIR" -czf "$RUNNER_TEMP/site.tar.gz" .
+          else
+            tar -C "$PAGES_SOURCE_DIR" \
+              --exclude='./.*' \
+              --exclude='*/.*' \
+              -czf "$RUNNER_TEMP/site.tar.gz" .
+          fi
+
+      - name: Upload to pages deployer
+        run: |
+          curl -fsS -X POST "http://pages-deployer:8080/deploy" \
+            -H "Authorization: Bearer ${{ secrets.PAGES_DEPLOY_TOKEN }}" \
+            -H "Content-Type: application/gzip" \
+            -H "X-Forgejo-Repository: ${{ github.repository }}" \
+            -H "X-Forgejo-Ref: ${{ github.ref }}" \
+            -H "X-Forgejo-Sha: ${{ github.sha }}" \
+            -H "X-Pages-Target: $PAGES_TARGET" \
+            -H "X-Pages-Include-Hidden: $PAGES_INCLUDE_HIDDEN" \
+            --data-binary @"$RUNNER_TEMP/site.tar.gz"
